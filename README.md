@@ -9,7 +9,7 @@ Um das Projekt herunterzuladen, folge diesen Schritten:
 1. Gehe auf die Seite: [https://github.com/mojelumi0/SpardosenManager](https://github.com/mojelumi0/SpardosenManager)
 2. Klicke auf **"Code"** und dann auf **"Download ZIP"**.
 3. Der ZIP-Ordner wird in deinem Download-Ordner gespeichert. Extrahiere ihn.
-4. Nach dem Extrahieren findest du die Hauptdatei (´main.py`) im Ordner.
+4. Nach dem Extrahieren findest du die Hauptdatei (`main.py`) im Ordner.
 
 Stelle sicher, dass du Python installiert hast. Für die Bearbeitung empfehlen wir einen Editor wie Visual Studio Code.
 
