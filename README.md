@@ -1,6 +1,6 @@
 # Spardosen Manager
 
-Spardosen Manager ist ein Python-Programm, mit dem du den Kontostand deiner Spardose verwalten kannst. Die Anwendung bietet sowohl einen grafischen Modus (GUI) als auch einen textbasierten Modus (CLI) und speichert alle Einstellungen (Sprache, Währung, Theme, Fenstermodus) sowie den Kontostand.
+Spardosen Manager ist ein Python-Programm, mit dem du den Kontostand deiner Spardose verwalten kannst. Die Anwendung bietet sowohl einen grafischen Modus (GUI) als auch einen textbasierten Modus (CLI) und speichert alle Einstellungen (Sprache, Währung, Theme, Fenstermodus), den Kontostand sowie den Verlauf der Ein- und Auszahlungen in XML-Dateien.
 
 ## Download
 
@@ -19,9 +19,10 @@ Stelle sicher, dass du Python installiert hast. Für die Bearbeitung empfehlen w
 
 1. Führe das Skript ohne Parameter aus, um den grafischen Modus zu starten.
 2. Gib einen Betrag in das Eingabefeld ein.
-3. Klicke auf "Geld einzahlen" oder "Geld auszahlen", um die jeweilige Aktion durchzuführen.
+3. Klicke auf **"Geld einzahlen"** oder **"Geld auszahlen"**, um die jeweilige Aktion durchzuführen.
 4. Der aktuelle Kontostand wird angezeigt und bei Änderungen sofort aktualisiert.
-5. Ändere über das Menü "Einstellungen" (Theme, Sprache, Währung, Fenstermodus) deine persönlichen Einstellungen.
+5. Bei maximiertem oder vollbildgeschaltetem Fenster werden die letzten 5 Transaktionen (Einzahlungen und Auszahlungen) im History-Bereich angezeigt.
+6. Ändere über das Menü **"Einstellungen"** (Theme, Sprache, Währung, Fenstermodus) deine persönlichen Einstellungen.
 
 ### Kommandozeilenmodus (CLI)
 
@@ -30,7 +31,11 @@ Stelle sicher, dass du Python installiert hast. Für die Bearbeitung empfehlen w
 
 ## Einstellungen
 
-Alle Einstellungen werden in der Datei `settings.json` gespeichert, während der Kontostand in der Datei `spardose.txt` abgelegt wird. Diese Dateien befinden sich im gleichen Verzeichnis wie das Skript.
+- Alle Einstellungen werden in der Datei `settings.json` gespeichert.
+- Der Kontostand wird in der Datei `spardose.txt` abgelegt.
+- Der Verlauf der Transaktionen (Einzahlungen und Auszahlungen) wird in den Dateien `deposit_history.xml` und `withdraw_history.xml` gespeichert.
+
+Diese Dateien befinden sich alle im gleichen Verzeichnis wie das Skript.
 
 - **Sprache:** Wähle zwischen Deutsch und Englisch.
 - **Währung:** Lege dein bevorzugtes Währungssymbol fest.
