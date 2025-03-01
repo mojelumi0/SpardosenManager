@@ -113,15 +113,15 @@ class PiggyBankApp:
         self.master.title(self.get_text('title'))
         
         # Create the menu bar using translations for all labels
-        self.menu = Menu(self.master)
+        self.menu = tk.Menu(self.master)
         self.master.config(menu=self.menu)
         
-        self.settings_menu = Menu(self.menu, tearoff=0)
+        self.settings_menu = tk.Menu(self.menu, tearoff=0)
         self.menu.add_cascade(label=self.get_text('settings'), menu=self.settings_menu)
         self.settings_menu.add_command(label=self.get_text('toggle_theme'), command=self.toggle_theme)
         
         # Language menu within settings
-        self.lang_menu = Menu(self.settings_menu, tearoff=0)
+        self.lang_menu = tk.Menu(self.settings_menu, tearoff=0)
         self.settings_menu.add_cascade(label=self.get_text('language'), menu=self.lang_menu)
         self.lang_menu.add_command(label="Deutsch", command=lambda: self.set_language('de'))
         self.lang_menu.add_command(label="English", command=lambda: self.set_language('en'))
@@ -130,7 +130,7 @@ class PiggyBankApp:
         self.settings_menu.add_command(label=self.get_text('change_currency'), command=self.change_currency)
         
         # Window mode menu within settings
-        self.window_menu = Menu(self.settings_menu, tearoff=0)
+        self.window_menu = tk.Menu(self.settings_menu, tearoff=0)
         self.settings_menu.add_cascade(label=self.get_text('window_mode'), menu=self.window_menu)
         self.window_menu.add_command(label=self.get_text('normal'), command=lambda: self.set_window_mode('normal'))
         self.window_menu.add_command(label=self.get_text('fullscreen'), command=lambda: self.set_window_mode('fullscreen'))
@@ -142,19 +142,35 @@ class PiggyBankApp:
         self.main_frame.pack(expand=True, padx=20, pady=20)
         
         # Display current balance
-        self.balance_label = tk.Label(self.main_frame, text=self.get_text('current_balance') + f" {self.balance:.2f}{self.currency}", font=("Arial", 16))
+        self.balance_label = tk.Label(
+            self.main_frame, 
+            text=self.get_text('current_balance') + f" {self.balance:.2f}{self.currency}", 
+            font=("Arial", 16)
+        )
         self.balance_label.grid(row=0, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         
         # Input field for the amount
         self.amount_entry = tk.Entry(self.main_frame, font=("Arial", 14))
         self.amount_entry.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky="ew")
+        # Bind the Enter key to trigger deposit
+        self.amount_entry.bind("<Return>", lambda event: self.deposit())
         
         # Button for depositing money
-        self.deposit_button = tk.Button(self.main_frame, text=self.get_text('deposit'), command=self.deposit, font=("Arial", 14))
+        self.deposit_button = tk.Button(
+            self.main_frame, 
+            text=self.get_text('deposit'), 
+            command=self.deposit, 
+            font=("Arial", 14)
+        )
         self.deposit_button.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
         
         # Button for withdrawing money
-        self.withdraw_button = tk.Button(self.main_frame, text=self.get_text('withdraw'), command=self.withdraw, font=("Arial", 14))
+        self.withdraw_button = tk.Button(
+            self.main_frame, 
+            text=self.get_text('withdraw'), 
+            command=self.withdraw, 
+            font=("Arial", 14)
+        )
         self.withdraw_button.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         
         self.main_frame.columnconfigure(0, weight=1)
@@ -179,7 +195,9 @@ class PiggyBankApp:
     def deposit(self):
         """Increases the balance by the entered amount and updates the display."""
         try:
-            amount = float(self.amount_entry.get())
+            # Ersetze Komma durch Punkt für korrekte Float-Konvertierung
+            input_str = self.amount_entry.get().replace(",", ".")
+            amount = float(input_str)
             self.balance += amount
             save_balance(self.balance)
             self.update_balance_label()
@@ -190,7 +208,9 @@ class PiggyBankApp:
     def withdraw(self):
         """Decreases the balance by the entered amount if sufficient funds exist."""
         try:
-            amount = float(self.amount_entry.get())
+            # Ersetze Komma durch Punkt für korrekte Float-Konvertierung
+            input_str = self.amount_entry.get().replace(",", ".")
+            amount = float(input_str)
             if amount > self.balance:
                 messagebox.showerror("Error", self.get_text('error_insufficient'))
             else:
@@ -306,7 +326,8 @@ def run_cli():
         choice = input("Choose an option: ")
         if choice == "1":
             try:
-                amount = float(input("How much do you want to deposit? "))
+                input_str = input("How much do you want to deposit? ").replace(",", ".")
+                amount = float(input_str)
                 balance += amount
                 save_balance(balance)
                 currency = load_settings().get('currency', '€')
@@ -315,7 +336,8 @@ def run_cli():
                 print("Invalid input, please try again.")
         elif choice == "2":
             try:
-                amount = float(input("How much do you want to withdraw? "))
+                input_str = input("How much do you want to withdraw? ").replace(",", ".")
+                amount = float(input_str)
                 if amount > balance:
                     print("Error: Not enough money in the piggy bank!")
                 else:
