@@ -6,23 +6,26 @@ from tkinter import messagebox, simpledialog, Menu
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-# Base directory (same folder where the script is located)
+# Basisverzeichnis (gleicher Ordner wie das Skript)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BALANCE_FILE = os.path.join(BASE_DIR, "spardose.txt")
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 DEPOSIT_HISTORY_FILE = os.path.join(BASE_DIR, "deposit_history.xml")
 WITHDRAW_HISTORY_FILE = os.path.join(BASE_DIR, "withdraw_history.xml")
 
-# Default settings for the application
+# Standard-Einstellungen für die Anwendung
 DEFAULT_SETTINGS = {
     "language": "de",
     "currency": "€",
-    "theme": "light",         # Options: "light" or "dark"
-    "window_mode": "normal"   # Options: "normal", "fullscreen", "maximized", "minimized"
+    "theme": "light",         # Optionen: "light" oder "dark"
+    "window_mode": "normal"     # Optionen: "normal", "fullscreen", "maximized", "minimized"
 }
 
 def load_balance():
-    """Lädt den Kontostand aus der Datei. Gibt 0.0 zurück, falls die Datei nicht existiert oder ein Fehler auftritt."""
+    """Lädt den Kontostand aus der Datei.
+    
+    Gibt 0.0 zurück, falls die Datei nicht existiert oder ein Fehler auftritt.
+    """
     if os.path.exists(BALANCE_FILE):
         try:
             with open(BALANCE_FILE, "r") as f:
@@ -37,7 +40,7 @@ def save_balance(balance):
         f.write(str(balance))
 
 def load_settings():
-    """Lädt die Anwendungseinstellungen aus einer JSON-Datei und füllt fehlende Werte mit den Standardwerten."""
+    """Lädt die Anwendungseinstellungen aus einer JSON-Datei und ergänzt fehlende Werte mit Standardwerten."""
     if os.path.exists(SETTINGS_FILE):
         try:
             with open(SETTINGS_FILE, "r") as f:
@@ -57,7 +60,10 @@ def save_settings(settings):
         json.dump(settings, f)
 
 def record_deposit_transaction(amount, new_balance):
-    """Speichert eine Einzahlungstransaktion in der XML-Datei (inkl. Zeitstempel, aber nur in der XML)."""
+    """Speichert eine Einzahlungstransaktion in der XML-Datei.
+    
+    Die Transaktion wird mit Betrag, neuem Kontostand und Zeitstempel (ISO-Format) gespeichert.
+    """
     timestamp = datetime.now().isoformat()
     if os.path.exists(DEPOSIT_HISTORY_FILE):
         try:
@@ -77,7 +83,10 @@ def record_deposit_transaction(amount, new_balance):
     tree.write(DEPOSIT_HISTORY_FILE, encoding="utf-8", xml_declaration=True)
 
 def record_withdraw_transaction(amount, new_balance):
-    """Speichert eine Auszahlungstransaktion in der XML-Datei (inkl. Zeitstempel, aber nur in der XML)."""
+    """Speichert eine Auszahlungstransaktion in der XML-Datei.
+    
+    Die Transaktion wird mit Betrag, neuem Kontostand und Zeitstempel (ISO-Format) gespeichert.
+    """
     timestamp = datetime.now().isoformat()
     if os.path.exists(WITHDRAW_HISTORY_FILE):
         try:
@@ -144,7 +153,7 @@ translations = {
 
 class PiggyBankApp:
     def __init__(self, master):
-        """Initialisiert die GUI-Anwendung, lädt Einstellungen und Kontostand und baut das Layout auf."""
+        """Initialisiert die GUI-Anwendung, lädt Einstellungen und Kontostand, baut das Layout auf und aktualisiert den Transaktionsverlauf."""
         self.master = master
         self.settings = load_settings()
         self.language = self.settings.get("language", "de")
@@ -158,10 +167,10 @@ class PiggyBankApp:
         self.update_history()
 
     def setup_ui(self):
-        """Erstellt das GUI-Layout mit Menüs, Eingabefeldern, Buttons und History (nur bei maximiert/vollbild)."""
+        """Erstellt das GUI-Layout mit Menüs, Eingabefeldern, Buttons und einem History-Panel für Transaktionen."""
         self.master.title(self.get_text('title'))
         
-        # Menüleiste
+        # Erstellen der Menüleiste mit übersetzten Labels
         self.menu = tk.Menu(self.master)
         self.master.config(menu=self.menu)
         
@@ -188,7 +197,7 @@ class PiggyBankApp:
         
         # Haupt-Frame für Widgets
         self.main_frame = tk.Frame(self.master)
-        self.main_frame.pack(expand=True, padx=20, pady=20)  # Standard: etwas Platz, aber kein „großes“ Padding
+        self.main_frame.pack(expand=True, padx=20, pady=20)
         
         # Anzeige des aktuellen Kontostands
         self.balance_label = tk.Label(
@@ -198,7 +207,7 @@ class PiggyBankApp:
         )
         self.balance_label.grid(row=0, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         
-        # Eingabefeld für den Betrag
+        # Eingabefeld für den Betrag (ENTER-Taste löst Einzahlung aus)
         self.amount_entry = tk.Entry(self.main_frame, font=("Arial", 14))
         self.amount_entry.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         self.amount_entry.bind("<Return>", lambda event: self.deposit())
@@ -220,7 +229,7 @@ class PiggyBankApp:
         )
         self.withdraw_button.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         
-        # History-Frame: Links Einzahlungen, rechts Auszahlungen (jeweils letzte 5)
+        # History-Frame: Anzeige der letzten 5 Einzahlungen und Auszahlungen
         self.history_frame = tk.Frame(self.main_frame)
         self.history_frame.grid(row=3, column=0, columnspan=2, pady=(10, 0), sticky="nsew")
         self.history_frame.columnconfigure(0, weight=1)
@@ -253,7 +262,7 @@ class PiggyBankApp:
         self.master.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def center_window(self, width=400, height=300):
-        """Zentriert das Fenster auf dem Bildschirm."""
+        """Zentriert das Fenster auf dem Bildschirm mit der angegebenen Größe."""
         self.master.update_idletasks()
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
@@ -262,11 +271,14 @@ class PiggyBankApp:
         self.master.geometry(f"{width}x{height}+{x}+{y}")
 
     def get_text(self, key):
-        """Gibt den übersetzten Text zum gegebenen Schlüssel zurück."""
+        """Gibt den übersetzten Text für den angegebenen Schlüssel zurück."""
         return translations[self.language][key]
 
     def update_history(self):
-        """Lädt die letzten 5 Transaktionen aus den XML-Dateien und zeigt sie in den Listboxen an (ohne Zeit)."""
+        """Lädt die letzten 5 Transaktionen aus den XML-Dateien und zeigt sie in den Listboxen an.
+        
+        Es werden nur Betrag und neuer Kontostand (ohne Zeit) angezeigt.
+        """
         # Einzahlungen
         deposit_transactions = []
         if os.path.exists(DEPOSIT_HISTORY_FILE):
@@ -278,7 +290,6 @@ class PiggyBankApp:
                 for t in last_transactions:
                     amount = t.get("amount")
                     new_balance = t.get("new_balance")
-                    # Uhrzeit NICHT anzeigen, nur Beträge
                     deposit_transactions.append(f"{amount}{self.currency} → {new_balance}{self.currency}")
             except Exception:
                 deposit_transactions.append("Fehler beim Laden")
@@ -299,7 +310,6 @@ class PiggyBankApp:
                 for t in last_transactions:
                     amount = t.get("amount")
                     new_balance = t.get("new_balance")
-                    # Uhrzeit NICHT anzeigen, nur Beträge
                     withdraw_transactions.append(f"{amount}{self.currency} → {new_balance}{self.currency}")
             except Exception:
                 withdraw_transactions.append("Fehler beim Laden")
@@ -310,7 +320,7 @@ class PiggyBankApp:
             self.withdraw_listbox.insert(tk.END, item)
 
     def deposit(self):
-        """Erhöht den Kontostand um den eingegebenen Betrag, speichert die Transaktion und aktualisiert die Anzeige."""
+        """Erhöht den Kontostand um den eingegebenen Betrag, speichert die Transaktion und aktualisiert Anzeige sowie History."""
         try:
             input_str = self.amount_entry.get().replace(",", ".")
             amount = float(input_str)
@@ -324,7 +334,7 @@ class PiggyBankApp:
         self.amount_entry.delete(0, tk.END)
 
     def withdraw(self):
-        """Verringert den Kontostand um den eingegebenen Betrag (falls genügend Guthaben vorhanden) und speichert die Transaktion."""
+        """Verringert den Kontostand um den eingegebenen Betrag (sofern genügend Guthaben vorhanden) und speichert die Transaktion."""
         try:
             input_str = self.amount_entry.get().replace(",", ".")
             amount = float(input_str)
@@ -345,14 +355,14 @@ class PiggyBankApp:
         self.balance_label.config(text=self.get_text('current_balance') + f" {self.balance:.2f}{self.currency}")
 
     def toggle_theme(self):
-        """Wechselt zwischen dunklem und hellem Theme, speichert die Einstellung und wendet sie an."""
+        """Wechselt zwischen dunklem und hellem Theme, speichert die Einstellung und wendet diese an."""
         self.theme = 'dark' if self.theme == 'light' else 'light'
         self.settings['theme'] = self.theme
         save_settings(self.settings)
         self.apply_theme()
 
     def apply_theme(self):
-        """Wendet die Theme-Farben auf die Benutzeroberfläche an."""
+        """Wendet die Farben des aktuellen Themes auf die gesamte Benutzeroberfläche an."""
         if self.theme == 'dark':
             bg_color = "#2e2e2e"
             fg_color = "#ffffff"
@@ -374,14 +384,14 @@ class PiggyBankApp:
         self.withdraw_listbox.configure(bg=bg_color, fg=fg_color)
 
     def set_language(self, lang):
-        """Ändert die Anzeigesprache, speichert die Einstellung und aktualisiert die Texte."""
+        """Ändert die Anzeigesprache, speichert die Einstellung und aktualisiert alle UI-Texte."""
         self.language = lang
         self.settings['language'] = lang
         save_settings(self.settings)
         self.update_ui_texts()
 
     def update_ui_texts(self):
-        """Aktualisiert alle Texte in der Benutzeroberfläche (Fenstertitel, Buttons, Menüs)."""
+        """Aktualisiert sämtliche Texte in der Benutzeroberfläche (Fenstertitel, Buttons, Menüs, History-Labels)."""
         self.master.title(self.get_text('title'))
         self.deposit_button.config(text=self.get_text('deposit'))
         self.withdraw_button.config(text=self.get_text('withdraw'))
@@ -398,7 +408,7 @@ class PiggyBankApp:
         self.withdraw_history_label.config(text=self.get_text('withdraw_history'))
 
     def change_currency(self):
-        """Ermöglicht das Ändern des Währungssymbols und speichert die neue Einstellung."""
+        """Ermöglicht das Ändern des Währungssymbols, speichert die neue Einstellung und aktualisiert Anzeige und History."""
         prompt = self.get_text('currency_prompt')
         new_currency = simpledialog.askstring("Currency", prompt)
         if new_currency:
@@ -409,14 +419,14 @@ class PiggyBankApp:
             self.update_history()
 
     def set_window_mode(self, mode):
-        """Setzt den Fenstermodus (normal, fullscreen, maximiert, minimiert) und speichert die Einstellung."""
+        """Setzt den Fenstermodus (normal, fullscreen, maximiert, minimiert), speichert die Einstellung und passt die Anzeige des History-Panels an."""
         self.window_mode = mode
         self.settings['window_mode'] = mode
         save_settings(self.settings)
         self.apply_window_mode()
 
     def apply_window_mode(self):
-        """Wendet den ausgewählten Fenstermodus an und zeigt die History nur in 'maximized' oder 'fullscreen'."""
+        """Wendet den gewählten Fenstermodus an, zentriert das Fenster im Normal-Modus und zeigt das History-Panel nur bei 'maximized' oder 'fullscreen'."""
         self.master.attributes("-fullscreen", False)
         if self.window_mode == 'fullscreen':
             self.master.attributes("-fullscreen", True)
@@ -428,14 +438,14 @@ class PiggyBankApp:
             self.master.state("normal")
             self.center_window(400, 300)
         
-        # History-Panel nur in "maximiert" oder "vollbild" anzeigen
+        # History-Panel nur anzeigen, wenn das Fenster maximiert oder im Vollbildmodus ist
         if self.window_mode in ['maximized', 'fullscreen']:
             self.history_frame.grid()
         else:
             self.history_frame.grid_remove()
 
     def on_close(self):
-        """Speichert die Einstellungen und schließt die Anwendung."""
+        """Speichert die aktuellen Einstellungen und schließt die Anwendung."""
         save_settings(self.settings)
         self.master.destroy()
 
